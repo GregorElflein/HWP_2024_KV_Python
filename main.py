@@ -37,7 +37,7 @@ def get_operators(operators):
     return letters
 
 
-# TODO maybe fix how the letter-combinations are sorted
+# TODO maybe fix how the letter-combinations are sorted (make grey code)
 # combine different letters
 def combine_letters(letter_list):
     while len(letter_list) > 1:
