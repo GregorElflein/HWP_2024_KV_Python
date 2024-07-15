@@ -40,23 +40,31 @@ def get_operators(operators):
 # TODO maybe fix how the letter-combinations are sorted (make grey code)
 # combine different letters
 def combine_letters(letter_list):
+
     while len(letter_list) > 1:
         letter_list[0].append(letter_list[0][1]), letter_list[0].append(letter_list[0][0])
         for elements_x0 in range(len(letter_list[0]) // 2):
             letter_list[0][elements_x0 * 2] = letter_list[0][elements_x0 * 2] + " " + letter_list[1][0]
             letter_list[0][elements_x0 * 2 + 1] = letter_list[0][elements_x0 * 2 + 1] + " " + letter_list[1][1]
         letter_list.pop(1)
+    print(letter_list[0])
     return letter_list[0]
 
 
-# TODO print better... a lot better
 # prints table as pretty table
 def print_kv(kv):
-    print(kv[0][0])
+    
+    row = kv[0][0]
+    for cell in row:
+        print('| {0:^{width}}'.format(cell, width=7 * (len(kv[0][0][0]) - 2)), end='')
+    print("| \n")
+    
     for rows in range(len(kv[1])):
-        test = kv[1][rows]
-        test.insert(0, kv[0][1][rows])
-        print(test)
+        row = kv[1][rows]
+        row.insert(0, kv[0][1][rows])
+        for cell in row:
+            print('| {0:^{width}}'.format(cell, width=7 * (len(kv[0][0][0]) - 2)), end='')
+        print("| \n")
 
 
 # Press the green button in the gutter to run the script.
