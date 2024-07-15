@@ -1,4 +1,50 @@
-raw_kv = "5,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1"
+raw_kv = "4,0,*,0,*,0,*,0,*,1,*,1,*,1,*,0,*"
+#raw_kv = "5,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1"
+#raw_kv = "3,0,1,1,1,1,0,*,*"
+def xor_c(a, b):
+    return '0' if (a == b) else '1'
+
+
+def flip(c):
+    return '1' if (c == '0') else '0'
+
+
+def binarytogray(binary):
+    gray = ""
+    gray += binary[0]
+    for i in range(1, len(binary)):
+        gray += xor_c(binary[i - 1],
+                      binary[i])
+    return gray
+
+
+def graytobinary(gray):
+    binary = ""
+    binary += gray[0]
+    for i in range(1, len(gray)):
+        if gray[i] == '0':
+            binary += binary[i - 1]
+        else:
+            binary += flip(binary[i - 1])
+    return binary
+
+
+def binarytoint(binary):
+    return int(binary, 2)
+
+
+def inttobinary(integer, length):
+    return format(integer, '0' + str(length) + 'b')
+
+
+def opal_to_gray(opal):
+    gray = []
+
+    return gray
+
+
+def graytoint(gray):
+    return binarytoint(graytobinary(gray))
 
 
 # converts raw KV input into table form
@@ -7,14 +53,18 @@ def get_kv(raw_input):
     operators = [raw_operators // 2 + raw_operators % 2, raw_operators // 2]    # Operators x and Operators y
     table_content = raw_input.split(',', 1)[1].split(',')
     table_validation(table_content)
+    gray_op = get_graycode(operators)
 
     table = []
-    for columns in range(2 ** operators[1]):   # y
-        row = []
-        for rows in range(2 ** operators[0]):  # x
-            row.append(table_content[columns * 2 ** operators[0] + rows])
-        table.append(row)
-    return get_operators(operators), table     # returns horizontal operators, vertical operators, table contents
+    for elements2 in gray_op[1]:
+        helper = []
+        for elements in gray_op[0]:
+            value = table_content[binarytoint(elements2 + elements)]
+            helper.append(value)
+        table.append(helper)
+
+    gray_op[0].insert(0, 'XX')
+    return gray_op, table     # returns horizontal operators, vertical operators, table contents
 
 
 # validates if the input given for the KV is correct
@@ -26,44 +76,30 @@ def table_validation(table):
 
 
 # takes count of operators and returns specific combinations [[[x], [x], ..], [[y], [y], ...]]
-def get_operators(operators):
-    letters = [[], []]
-    for x_operators in range(operators[0]):
-        letters[0].append([chr(97 + x_operators), "not(" + chr(97 + x_operators) + ")"])     # x are small letters
-    for y_operators in range(operators[1]):
-        letters[1].append([chr(65 + y_operators), "not(" + chr(65 + y_operators) + ")"])     # y are large letters
-    letters[0] = combine_letters(letters[0])
-    letters[1] = combine_letters(letters[1])
-    return letters
+def get_graycode(op_counts):
+    operators = [[], []]
+    for elements in range(2**op_counts[0]):
+        operators[0].append(binarytogray((inttobinary(elements, op_counts[0]))))
+    for elements in range(2**op_counts[1]):
+        operators[1].append(binarytogray(inttobinary(elements, op_counts[1])))
 
-
-# TODO maybe fix how the letter-combinations are sorted (make grey code)
-# combine different letters
-def combine_letters(letter_list):
-
-    while len(letter_list) > 1:
-        letter_list[0].append(letter_list[0][1]), letter_list[0].append(letter_list[0][0])
-        for elements_x0 in range(len(letter_list[0]) // 2):
-            letter_list[0][elements_x0 * 2] = letter_list[0][elements_x0 * 2] + " " + letter_list[1][0]
-            letter_list[0][elements_x0 * 2 + 1] = letter_list[0][elements_x0 * 2 + 1] + " " + letter_list[1][1]
-        letter_list.pop(1)
-    print(letter_list[0])
-    return letter_list[0]
+    print(operators)
+    return operators
 
 
 # prints table as pretty table
 def print_kv(kv):
-    
+    print(kv)
     row = kv[0][0]
     for cell in row:
-        print('| {0:^{width}}'.format(cell, width=7 * (len(kv[0][0][0]) - 2)), end='')
+        print('| {0:^{width}}'.format(cell, width=4 * (len(kv[0][0][0])-1)), end='')
     print("| \n")
-    
+
     for rows in range(len(kv[1])):
         row = kv[1][rows]
         row.insert(0, kv[0][1][rows])
         for cell in row:
-            print('| {0:^{width}}'.format(cell, width=7 * (len(kv[0][0][0]) - 2)), end='')
+            print('| {0:^{width}}'.format(cell, width=4 * (len(kv[0][0][0])-1)), end='')
         print("| \n")
 
 
