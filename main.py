@@ -1,6 +1,8 @@
-raw_kv = "4,0,*,0,*,0,*,0,*,1,*,1,*,1,*,0,*"
-#raw_kv = "5,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1"
 #raw_kv = "3,0,1,1,1,1,0,*,*"
+#raw_kv = "4,0,*,0,*,0,*,0,*,1,*,1,*,1,*,0,*"
+raw_kv = "5,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1"
+
+
 def xor_c(a, b):
     return '0' if (a == b) else '1'
 
@@ -9,18 +11,16 @@ def flip(c):
     return '1' if (c == '0') else '0'
 
 
-def binarytogray(binary):
-    gray = ""
-    gray += binary[0]
+def binary_to_gray(binary):
+    gray = binary[0]
     for i in range(1, len(binary)):
-        gray += xor_c(binary[i - 1],
-                      binary[i])
+        gray += xor_c(binary[i - 1], binary[i])
     return gray
 
 
-def graytobinary(gray):
-    binary = ""
-    binary += gray[0]
+# TODO why do we need this?
+def gray_to_binary(gray):
+    binary = gray[0]
     for i in range(1, len(gray)):
         if gray[i] == '0':
             binary += binary[i - 1]
@@ -29,22 +29,23 @@ def graytobinary(gray):
     return binary
 
 
-def binarytoint(binary):
+def binary_to_int(binary):
     return int(binary, 2)
 
 
-def inttobinary(integer, length):
+def int_to_binary(integer, length):
     return format(integer, '0' + str(length) + 'b')
 
 
+# TODO
 def opal_to_gray(opal):
     gray = []
-
     return gray
 
 
-def graytoint(gray):
-    return binarytoint(graytobinary(gray))
+# TODO why do we need this?
+def gray_to_int(gray):
+    return binary_to_int(gray_to_binary(gray))
 
 
 # converts raw KV input into table form
@@ -59,7 +60,7 @@ def get_kv(raw_input):
     for elements2 in gray_op[1]:
         helper = []
         for elements in gray_op[0]:
-            value = table_content[binarytoint(elements2 + elements)]
+            value = table_content[binary_to_int(elements2 + elements)]
             helper.append(value)
         table.append(helper)
 
@@ -79,9 +80,9 @@ def table_validation(table):
 def get_graycode(op_counts):
     operators = [[], []]
     for elements in range(2**op_counts[0]):
-        operators[0].append(binarytogray((inttobinary(elements, op_counts[0]))))
+        operators[0].append(binary_to_gray((int_to_binary(elements, op_counts[0]))))
     for elements in range(2**op_counts[1]):
-        operators[1].append(binarytogray(inttobinary(elements, op_counts[1])))
+        operators[1].append(binary_to_gray(int_to_binary(elements, op_counts[1])))
 
     print(operators)
     return operators
@@ -93,14 +94,14 @@ def print_kv(kv):
     row = kv[0][0]
     for cell in row:
         print('| {0:^{width}}'.format(cell, width=4 * (len(kv[0][0][0])-1)), end='')
-    print("| \n")
+    print("|")
 
     for rows in range(len(kv[1])):
         row = kv[1][rows]
         row.insert(0, kv[0][1][rows])
         for cell in row:
             print('| {0:^{width}}'.format(cell, width=4 * (len(kv[0][0][0])-1)), end='')
-        print("| \n")
+        print("|")
 
 
 # Press the green button in the gutter to run the script.
