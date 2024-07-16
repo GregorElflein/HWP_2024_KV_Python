@@ -18,6 +18,14 @@ def binary_to_gray(binary):
     return gray
 
 
+def binary_to_int(binary):
+    return int(binary, 2)
+
+
+def int_to_binary(integer, length):
+    return format(integer, '0' + str(length) + 'b')
+
+
 # TODO why do we need this?
 def gray_to_binary(gray):
     binary = gray[0]
@@ -29,15 +37,7 @@ def gray_to_binary(gray):
     return binary
 
 
-def binary_to_int(binary):
-    return int(binary, 2)
-
-
-def int_to_binary(integer, length):
-    return format(integer, '0' + str(length) + 'b')
-
-
-# TODO
+# TODO why do we need this?
 def opal_to_gray(opal):
     gray = []
     return gray
