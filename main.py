@@ -1,16 +1,19 @@
-#raw_kv = "3,0,1,1,1,1,0,*,*"
-#raw_kv = "4,0,*,0,*,0,*,0,*,1,*,1,*,1,*,0,*"
+# raw_kv = "3,0,1,1,1,1,0,*,*"
+# raw_kv = "4,0,*,0,*,0,*,0,*,1,*,1,*,1,*,0,*"
 raw_kv = "5,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1"
 
 
+# XOR function
 def xor_c(a, b):
     return '0' if (a == b) else '1'
 
 
+# flip Bit function
 def flip(c):
     return '1' if (c == '0') else '0'
 
 
+# convert Binary input via XOR to Gray code
 def binary_to_gray(binary):
     gray = binary[0]
     for i in range(1, len(binary)):
@@ -18,10 +21,13 @@ def binary_to_gray(binary):
     return gray
 
 
+# TODO why do we need this?
+# convert Binary to Integer
 def binary_to_int(binary):
     return int(binary, 2)
 
 
+# convert Integer to Binary
 def int_to_binary(integer, length):
     return format(integer, '0' + str(length) + 'b')
 
@@ -83,14 +89,11 @@ def get_graycode(op_counts):
         operators[0].append(binary_to_gray((int_to_binary(elements, op_counts[0]))))
     for elements in range(2**op_counts[1]):
         operators[1].append(binary_to_gray(int_to_binary(elements, op_counts[1])))
-
-    print(operators)
     return operators
 
 
 # prints table as pretty table
 def print_kv(kv):
-    print(kv)
     row = kv[0][0]
     for cell in row:
         print('| {0:^{width}}'.format(cell, width=4 * (len(kv[0][0][0])-1)), end='')
