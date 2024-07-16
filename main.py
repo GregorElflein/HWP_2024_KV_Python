@@ -21,37 +21,9 @@ def binary_to_gray(binary):
     return gray
 
 
-# TODO why do we need this?
-# convert Binary to Integer
-def binary_to_int(binary):
-    return int(binary, 2)
-
-
 # convert Integer to Binary
 def int_to_binary(integer, length):
     return format(integer, '0' + str(length) + 'b')
-
-
-# TODO why do we need this?
-def gray_to_binary(gray):
-    binary = gray[0]
-    for i in range(1, len(gray)):
-        if gray[i] == '0':
-            binary += binary[i - 1]
-        else:
-            binary += flip(binary[i - 1])
-    return binary
-
-
-# TODO why do we need this?
-def opal_to_gray(opal):
-    gray = []
-    return gray
-
-
-# TODO why do we need this?
-def gray_to_int(gray):
-    return binary_to_int(gray_to_binary(gray))
 
 
 # converts raw KV input into table form
@@ -66,7 +38,7 @@ def get_kv(raw_input):
     for elements2 in gray_op[1]:
         helper = []
         for elements in gray_op[0]:
-            value = table_content[binary_to_int(elements2 + elements)]
+            value = table_content[int(elements2 + elements, 2)]
             helper.append(value)
         table.append(helper)
 
