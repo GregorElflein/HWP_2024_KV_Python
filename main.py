@@ -1,5 +1,5 @@
 import math
-raw_kv = "4#0000000000110011"
+raw_kv = "4#1010101000000000"
 # raw_kv = "5#00000111000001110000011100000111"
 
 
@@ -14,6 +14,29 @@ class Block:
 
     def get_block(self, index):
         return self.block[index]
+
+    def get_all_vars(self):
+        all_vars = []
+        x1 = self.block[0]
+        y1 = self.block[1]
+        x2 = self.block[2]
+        y2 = self.block[3]
+        block_height = (y2 - y1) % self.height
+        block_width = (x2 - x1) % self.width
+
+        if x1 <= x2 and y1 <= y2:
+            for x in range(x1, x2 + 1):
+                for y in range(y1, y2 + 1):
+                    all_vars.append((x, y))
+        elif x1 <= x2 and y1 > y2:
+            for x in range(x1, x2 + 1):
+                for y in range(y1, y1 + block_height + 1):
+                    all_vars.append((x, y % self.height))
+        elif x1 > x2 and y1 <= y2:
+            for x in range(x1, x1 + block_width + 1):
+                for y in range(y1, y2 + 1):
+                    all_vars.append((x % self.width, y))
+        return all_vars
 
     def equals(self, blocks):
         equal = False
@@ -44,7 +67,6 @@ class Block:
         return decision
 
     def combine_block(self, block):
-        # TODO sort
         return Block(self.block[0], self.block[1], block.get_block(2), block.get_block(3), self.width, self.height)
 
 
@@ -158,7 +180,8 @@ def get_blox(kv, clause_type):
 
     for elements in range(len(block_list)):
         for block in block_list[elements]:
-            print(block)
+            print(block, end=' ')
+            print(block.get_all_vars())
 
 
 def get_clause(kv):
