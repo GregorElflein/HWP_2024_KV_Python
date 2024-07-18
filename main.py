@@ -1,6 +1,6 @@
 import math
-
-raw_kv = "5#00000111000001110000011100000111"
+raw_kv = "4#0000000000110011"
+# raw_kv = "5#00000111000001110000011100000111"
 
 
 class Block:
@@ -15,20 +15,37 @@ class Block:
     def get_block(self, index):
         return self.block[index]
 
+    def equals(self, blocks):
+        equal = False
+        for block in blocks:
+            if (self.block[0] == block.get_block(0) and self.block[1] == block.get_block(1)
+                    and self.block[2] == block.get_block(2) and self.block[3] == block.get_block(3)):
+                equal = True
+        return equal
+
+    def contains(self, blocks):
+        contains = False
+        for block in blocks:
+            if (self.block[0] <= block.get_block(0) and self.block[1] <= block.get_block(1)
+                    and self.block[2] >= block.get_block(2) and self.block[3] >= block.get_block(3)):
+                contains = True
+        return contains
+
     def check_neighbour(self, block):
         decision = False
         if block == self:
             pass
-        elif (self.get_block(0) == block[0] and self.get_block(2) == block[2]
-              and self.get_block(3) == (block[1] - 1) % self.height):
+        elif (self.block[0] == block.get_block(0) and self.block[2] == block.get_block(2)
+              and self.block[3] == (block.get_block(1) - 1) % self.height):
             decision = True
-        elif (self.get_block(1) == block[1] and self.get_block(3) == block[3]
-              and self.get_block(2) == (block[0] - 1) % self.width):
+        elif (self.block[1] == block.get_block(1) and self.block[3] == block.get_block(3)
+              and self.block[2] == (block.get_block(0) - 1) % self.width):
             decision = True
         return decision
 
     def combine_block(self, block):
-        return Block(self.get_block(0), self.get_block(1), block[2], block[3], self.width, self.height)
+        # TODO sort
+        return Block(self.block[0], self.block[1], block.get_block(2), block.get_block(3), self.width, self.height)
 
 
 # XOR function
@@ -111,31 +128,42 @@ def get_small_blocks(kv, width, height, clause_type):
     block_list = []
     for rows in range(height):
         for cells in range(len(kv[rows])):
-            if kv[rows][cells] == clause_type or kv[rows][cells] == '*':
-                print(Block(cells, rows, cells, rows, width, height))
+            if kv[rows][cells] in clause_type:
                 block_list.append(Block(cells, rows, cells, rows, width, height))
     return block_list
 
 
-def get_block_list(block_list, block_size, width, height):
-    pass
-    # TODO
-    # check neighbour
-    # combine block
-    # return das
+def get_block_list(block_list):
+    next_block_list = []
+    for block1 in block_list:
+        for block2 in block_list:
+            if block1.check_neighbour(block2):
+                if not block1.combine_block(block2).equals(next_block_list):
+                    next_block_list.append(block1.combine_block(block2))
+    return next_block_list
+
+
+def filter_blocks(block_list):
+    # TODO call contains
+    # TODO check contains (written by copilot)
+    return block_list
 
 
 def get_blox(kv, clause_type):
+    block_list = [get_small_blocks(kv, len(kv[0]), len(kv), clause_type)]
     for block_sizes in range(2, (math.floor(math.log2(len(kv) * len(kv[0])))) + 1):
-        pass
-        # TODO add for block sizes 2+
-        get_block_list(get_small_blocks(kv, len(kv[0]), len(kv), clause_type), 2 ** block_sizes, len(kv[0]), len(kv))
-    print(kv)
+        block_list.append(get_block_list(block_list[-1]))
+
+    block_list = filter_blocks(block_list)
+
+    for elements in range(len(block_list)):
+        for block in block_list[elements]:
+            print(block)
 
 
 def get_clause(kv):
     # TODO fix this
-    clause_type = '1'
+    clause_type = ['1', '*']
     get_blox(kv, clause_type)
     # clause_type = '0'
     # get_blox(kv, clause_type)
@@ -147,4 +175,3 @@ def get_clause(kv):
 if __name__ == '__main__':
     print_kv(get_kv(raw_kv))
     get_clause(get_kv(raw_kv)[1])
-    print
