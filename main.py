@@ -196,7 +196,8 @@ def get_clause(kv):
 
     # TODO calculate clause
     clause = []
-    return clause
+    print('\n\nClauses: ')
+    print(clause)
 
 
 # Press the green button in the gutter to run the script.
