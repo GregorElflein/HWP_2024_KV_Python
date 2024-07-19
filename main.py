@@ -1,5 +1,5 @@
 import math
-raw_kv = "4#1010101000000000"
+raw_kv = "4#1010111000000000"
 # raw_kv = "5#00000111000001110000011100000111"
 
 
@@ -46,13 +46,15 @@ class Block:
                 equal = True
         return equal
 
-    def contains(self, blocks):
-        contains = False
-        for block in blocks:
-            if (self.block[0] <= block.get_block(0) and self.block[1] <= block.get_block(1)
-                    and self.block[2] >= block.get_block(2) and self.block[3] >= block.get_block(3)):
-                contains = True
-        return contains
+    def is_contained(self, blocks):
+        contained = False
+        for elements in blocks:
+            for block in elements:
+                if (((self.block[0], self.block[1]) in block.get_all_vars()
+                        and (self.block[2], self.block[3]) in block.get_all_vars())
+                        and self != block):
+                    contained = True
+        return contained
 
     def check_neighbour(self, block):
         decision = False
@@ -116,7 +118,7 @@ def get_kv(raw_input):
 # validates if the input given for the KV is correct
 def table_validation(table):
     for elements in table:
-        if elements != '1' and elements != '0' and elements != '0':
+        if elements != '1' and elements != '0' and elements != '*':
             print('invalid input with: ' + elements)
             exit()
 
@@ -134,6 +136,8 @@ def get_graycode(op_counts):
 # prints table as pretty table
 def print_kv(kv):
     row = kv[0][0]
+
+    print('\nKV-Table:')
     for cell in row:
         print('| {0:^{width}}'.format(cell, width=4 * (len(kv[0][0][0]) - 1)), end='')  # TODO fix width scaling
     print("|")
@@ -166,30 +170,31 @@ def get_block_list(block_list):
 
 
 def filter_blocks(block_list):
-    # TODO call contains
-    # TODO check contains (written by copilot)
-    return block_list
+    filtered_block_list = []
+    for elements in block_list:
+        for block in elements:
+            if not block.is_contained(block_list):
+                filtered_block_list.append(block)
+    return filtered_block_list
 
 
 def get_blox(kv, clause_type):
     block_list = [get_small_blocks(kv, len(kv[0]), len(kv), clause_type)]
     for block_sizes in range(2, (math.floor(math.log2(len(kv) * len(kv[0])))) + 1):
         block_list.append(get_block_list(block_list[-1]))
-
     block_list = filter_blocks(block_list)
-
-    for elements in range(len(block_list)):
-        for block in block_list[elements]:
-            print(block, end=' ')
-            print(block.get_all_vars())
+    return block_list
 
 
 def get_clause(kv):
-    # TODO fix this
     clause_type = ['1', '*']
-    get_blox(kv, clause_type)
-    # clause_type = '0'
-    # get_blox(kv, clause_type)
+    block_list = get_blox(kv, clause_type)
+
+    print('\nBlocks: ')
+    for block in block_list:
+        print(block, end=' ')
+
+    # TODO calculate clause
     clause = []
     return clause
 
