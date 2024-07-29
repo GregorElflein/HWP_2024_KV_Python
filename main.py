@@ -1,6 +1,7 @@
 import math
-raw_kv = "4#1010111000000000"
-# raw_kv = "5#00000111000001110000011100000111"
+# raw_kv = "4#1010111000000000"
+# raw_kv = "4#0101000111111111"
+raw_kv = "5#00000111000001110000011100000111"
 
 
 class Block:
@@ -27,15 +28,15 @@ class Block:
         if x1 <= x2 and y1 <= y2:
             for x in range(x1, x2 + 1):
                 for y in range(y1, y2 + 1):
-                    all_vars.append((x, y))
+                    all_vars.append([x, y])
         elif x1 <= x2 and y1 > y2:
             for x in range(x1, x2 + 1):
                 for y in range(y1, y1 + block_height + 1):
-                    all_vars.append((x, y % self.height))
+                    all_vars.append([x, y % self.height])
         elif x1 > x2 and y1 <= y2:
             for x in range(x1, x1 + block_width + 1):
                 for y in range(y1, y2 + 1):
-                    all_vars.append((x % self.width, y))
+                    all_vars.append([x % self.width, y])
         return all_vars
 
     def equals(self, blocks):
@@ -46,14 +47,11 @@ class Block:
                 equal = True
         return equal
 
-    def is_contained(self, blocks):
-        contained = False
-        for elements in blocks:
-            for block in elements:
-                if (((self.block[0], self.block[1]) in block.get_all_vars()
-                        and (self.block[2], self.block[3]) in block.get_all_vars())
-                        and self != block):
-                    contained = True
+    def is_contained(self, block):
+        contained = True
+        for elements in self.get_all_vars():
+            if elements not in block.get_all_vars():
+                contained = False
         return contained
 
     def check_neighbour(self, block):
@@ -170,10 +168,19 @@ def get_block_list(block_list):
 
 
 def filter_blocks(block_list):
-    filtered_block_list = []
+    reversed_block = []
     for elements in block_list:
+        if elements:
+            reversed_block.insert(0, elements)
+    filtered_block_list = [reversed_block[0][0]]
+    for elements in reversed_block:
         for block in elements:
-            if not block.is_contained(block_list):
+            contained = False
+            for filtered in filtered_block_list:
+                if block.is_contained(filtered):
+                    contained = True
+
+            if not contained:
                 filtered_block_list.append(block)
     return filtered_block_list
 
