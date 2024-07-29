@@ -1,7 +1,8 @@
 import math
+
 # raw_kv = "4#1010111000000000"
-# raw_kv = "4#0101000111111111"
-raw_kv = "5#00000111000001110000011100000111"
+raw_kv = "4#0101000111111111"
+# raw_kv = "5#00000111000001110000011100000111"
 
 
 class Block:
@@ -69,6 +70,42 @@ class Block:
     def combine_block(self, block):
         return Block(self.block[0], self.block[1], block.get_block(2), block.get_block(3), self.width, self.height)
 
+    def get_func(self, x, y):
+        cords = [[], []]  # [[x], [y]]
+        for elements in self.get_all_vars():
+            if elements[0] not in cords[0]:
+                cords[0].append(elements[0])
+            if elements[1] not in cords[1]:
+                cords[1].append(elements[1])
+
+        max_number = [len(cords[0]), len(cords[1])]
+        int_x, int_y = 0, 0
+
+        for elements in cords[0]:
+            int_x += int(x[elements])
+        for elements in cords[1]:
+            int_y += int(y[elements])
+
+        str_x, str_y = (str(int_x).rjust(max_number[0] - len(str(int_x)) + 1, '0'),
+                        str(int_y).rjust(max_number[1] - len(str(int_y)) + 1, '0'))
+        # TODO if x-1 or 1-x block, fix, that part with 1 is accepted
+        clause = []
+        for chars in str_y:
+            if chars == '0':
+                clause.append('0')
+            elif chars == str(max_number[1]):
+                clause.append('1')
+            else:
+                clause.append('-')
+
+        for chars in str_x:
+            if chars == '0':
+                clause.append('0')
+            elif chars == str(max_number[0]):
+                clause.append('1')
+            else:
+                clause.append('-')
+        return clause
 
 # XOR function
 def xor_c(a, b):
@@ -108,8 +145,6 @@ def get_kv(raw_input):
             value = table_content[int(elements2 + elements, 2)]
             helper.append(value)
         table.append(helper)
-
-    gray_op[0].insert(0, 'XX')
     return gray_op, table  # returns horizontal operators, vertical operators, table contents
 
 
@@ -133,6 +168,7 @@ def get_graycode(op_counts):
 
 # prints table as pretty table
 def print_kv(kv):
+    kv[0][0].insert(0, 'XX')
     row = kv[0][0]
 
     print('\nKV-Table:')
@@ -179,7 +215,6 @@ def filter_blocks(block_list):
             for filtered in filtered_block_list:
                 if block.is_contained(filtered):
                     contained = True
-
             if not contained:
                 filtered_block_list.append(block)
     return filtered_block_list
@@ -194,16 +229,18 @@ def get_blox(kv, clause_type):
 
 
 def get_clause(kv):
-    clause_type = ['1', '*']
-    block_list = get_blox(kv, clause_type)
+    clause_type = ['0', '*']
+    block_list = get_blox(kv[1], clause_type)
 
     print('\nBlocks: ')
     for block in block_list:
         print(block, end=' ')
-        print(block.get_all_vars())
 
     # TODO calculate clause
     clause = []
+    for block in block_list:
+        clause.append(block.get_func(kv[0][0], kv[0][1]))
+
     print('\n\nClauses: ')
     print(clause)
 
@@ -211,4 +248,4 @@ def get_clause(kv):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_kv(get_kv(raw_kv))
-    get_clause(get_kv(raw_kv)[1])
+    get_clause(get_kv(raw_kv))
