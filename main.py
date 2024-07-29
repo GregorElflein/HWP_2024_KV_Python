@@ -1,7 +1,7 @@
 import math
 
 # raw_kv = "4#1010111000000000"
-raw_kv = "4#0101000111111111"
+raw_kv = "4#0101010100001111"
 # raw_kv = "5#00000111000001110000011100000111"
 
 
@@ -79,6 +79,7 @@ class Block:
                 cords[1].append(elements[1])
 
         max_number = [len(cords[0]), len(cords[1])]
+        max_gray = [len(x[0]), len(y[0])]
         int_x, int_y = 0, 0
 
         for elements in cords[0]:
@@ -86,9 +87,9 @@ class Block:
         for elements in cords[1]:
             int_y += int(y[elements])
 
-        str_x, str_y = (str(int_x).rjust(max_number[0] - len(str(int_x)) + 1, '0'),
-                        str(int_y).rjust(max_number[1] - len(str(int_y)) + 1, '0'))
-        # TODO if x-1 or 1-x block, fix, that part with 1 is accepted
+        str_x, str_y = (str(int_x).rjust(max_gray[0] - len(str(int_x)) + 1, '0'),
+                        str(int_y).rjust(max_gray[1] - len(str(int_y)) + 1, '0'))
+
         clause = []
         for chars in str_y:
             if chars == '0':
@@ -228,24 +229,38 @@ def get_blox(kv, clause_type):
     return block_list
 
 
+def print_clause(clause):
+    main_clause = ''
+    for clauses in clause:
+        for elements in range(len(clauses)):
+            if clauses[elements] == '0':
+                main_clause += ('E' + str(elements) + ' * ')
+            elif clauses[elements] == '1':
+                main_clause += ('-E' + str(elements) + ' * ')
+        main_clause = main_clause[:len(main_clause)-3] + '   +   '
+    print(main_clause[:len(main_clause)-5])
+
+
 def get_clause(kv):
-    clause_type = ['0', '*']
+    clause_type = ['1', '*']
     block_list = get_blox(kv[1], clause_type)
 
     print('\nBlocks: ')
     for block in block_list:
         print(block, end=' ')
 
-    # TODO calculate clause
     clause = []
     for block in block_list:
         clause.append(block.get_func(kv[0][0], kv[0][1]))
 
-    print('\n\nClauses: ')
-    print(clause)
+    print('\n\nClause: ')
+    print_clause(clause)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_kv(get_kv(raw_kv))
     get_clause(get_kv(raw_kv))
+
+# TODO fix too many blocks
+# TODO make clause printing variable
