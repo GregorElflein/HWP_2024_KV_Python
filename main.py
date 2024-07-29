@@ -200,6 +200,7 @@ def get_clause(kv):
     print('\nBlocks: ')
     for block in block_list:
         print(block, end=' ')
+        print(block.get_all_vars())
 
     # TODO calculate clause
     clause = []
