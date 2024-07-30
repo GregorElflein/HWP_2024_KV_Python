@@ -108,6 +108,7 @@ class Block:
                 clause.append('-')
         return clause
 
+
 # XOR function
 def xor_c(a, b):
     return '0' if (a == b) else '1'
@@ -221,23 +222,43 @@ def filter_blocks(block_list):
     return filtered_block_list
 
 
+def post_filter(block_list, block, flag):
+    cord_list = []
+    for blocks in block_list:
+        for cords in blocks.get_all_vars():
+            if cords not in cord_list and not blocks.equals([block]):
+                cord_list.append(cords)
+    count_vars = 0
+    for cords in block.get_all_vars():
+        if cords in cord_list:
+            count_vars += 1
+    if count_vars == len(block.get_all_vars()):
+        block_list.remove(block)
+        flag += 1
+    return block_list, flag
+
+
 def get_blox(kv, clause_type):
     block_list = [get_small_blocks(kv, len(kv[0]), len(kv), clause_type)]
     for block_sizes in range(2, (math.floor(math.log2(len(kv) * len(kv[0])))) + 1):
         block_list.append(get_block_list(block_list[-1]))
     block_list = filter_blocks(block_list)
+    block_list_size = len(block_list)
+    flag = 0
+    for block in range(block_list_size):
+        block_list, flag = post_filter(block_list, block_list[block - flag], flag)
     return block_list
 
 
-def print_clause(clause):
+def print_clause(clause, connections):
     main_clause = ''
     for clauses in clause:
         for elements in range(len(clauses)):
             if clauses[elements] == '0':
-                main_clause += ('E' + str(elements) + ' * ')
+                main_clause += ('E' + str(elements) + ' ' + connections[0] + ' ')
             elif clauses[elements] == '1':
-                main_clause += ('-E' + str(elements) + ' * ')
-        main_clause = main_clause[:len(main_clause)-3] + '   +   '
+                main_clause += ('-E' + str(elements) + ' ' + connections[0] + ' ')
+        main_clause = main_clause[:len(main_clause)-3] + '  ' + connections[1] + '  '
     print(main_clause[:len(main_clause)-5])
 
 
@@ -245,7 +266,7 @@ def get_clause(kv):
     clause_type = ['1', '*']
     block_list = get_blox(kv[1], clause_type)
 
-    print('\nBlocks: ')
+    print('\nBlocks-DNF: ')
     for block in block_list:
         print(block, end=' ')
 
@@ -253,8 +274,23 @@ def get_clause(kv):
     for block in block_list:
         clause.append(block.get_func(kv[0][0], kv[0][1]))
 
-    print('\n\nClause: ')
-    print_clause(clause)
+    print('\n\nClause-DNF: ')
+    print_clause(clause, ['*', '+'])
+
+    # KNF
+    clause_type = ['0', '*']
+    block_list = get_blox(kv[1], clause_type)
+
+    print('\nBlocks-KNF: ')
+    for block in block_list:
+        print(block, end=' ')
+
+    clause = []
+    for block in block_list:
+        clause.append(block.get_func(kv[0][0], kv[0][1]))
+
+    print('\n\nClause-KNF: ')
+    print_clause(clause, ['+', '*'])
 
 
 # Press the green button in the gutter to run the script.
@@ -262,5 +298,3 @@ if __name__ == '__main__':
     print_kv(get_kv(raw_kv))
     get_clause(get_kv(raw_kv))
 
-# TODO fix too many blocks
-# TODO make clause printing variable
